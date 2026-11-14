@@ -1,0 +1,29 @@
+{
+  "input_sha256": "76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89",
+  "results": {
+    "logistic_regression": {
+      "fn": 8,
+      "fp": 521,
+      "fraud": 57,
+      "k": 570,
+      "n": 56964,
+      "precision": 0.08596491228070176,
+      "recall": 0.8596491228070176,
+      "tn": 56386,
+      "tp": 49
+    },
+    "random_forest": {
+      "fn": 9,
+      "fp": 522,
+      "fraud": 57,
+      "k": 570,
+      "n": 56964,
+      "precision": 0.08421052631578947,
+      "recall": 0.8421052631578947,
+      "tn": 56385,
+      "tp": 48
+    }
+  },
+  "rule": "validation recall at 1%; tie: logistic_regression",
+  "selected_model": "logistic_regression"
+}

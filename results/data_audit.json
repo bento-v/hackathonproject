@@ -1,0 +1,39 @@
+{
+  "exact_duplicate_rows_beyond_first": 1081,
+  "fraud": 492,
+  "identical_feature_vectors_across_splits": {
+    "train__test": 312,
+    "train__validation": 274,
+    "validation__test": 872
+  },
+  "rows": 284807,
+  "splits": {
+    "test": {
+      "fraud": 75,
+      "fraud_prevalence": 0.0013166903670932743,
+      "legitimate": 56886,
+      "membership_sha256": "00562cdb8925e58dd28fbada3b3363c3456456d3815c20f109a871ecee82ef5c",
+      "rows": 56961,
+      "time_max": 172792.0,
+      "time_min": 145249.0
+    },
+    "train": {
+      "fraud": 360,
+      "fraud_prevalence": 0.002106716915766435,
+      "legitimate": 170522,
+      "membership_sha256": "024ad9180d21dd6c261f97dbc275dde13ad78e8191a2ef831e8f460df1a41a1c",
+      "rows": 170882,
+      "time_max": 120395.0,
+      "time_min": 0.0
+    },
+    "validation": {
+      "fraud": 57,
+      "fraud_prevalence": 0.001000631978091426,
+      "legitimate": 56907,
+      "membership_sha256": "4ba9df6c670f8c98401e043eeec91a213a5ec475874fe5e2bd0dfb21a428c3e5",
+      "rows": 56964,
+      "time_max": 145248.0,
+      "time_min": 120396.0
+    }
+  }
+}
