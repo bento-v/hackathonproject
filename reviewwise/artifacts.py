@@ -4,7 +4,7 @@ import importlib.metadata
 import json
 from pathlib import Path
 
-from reviewwise.config import FEATURES, MODEL_NAMES, MODEL_PARAMETERS, POLICY
+from reviewwise.config import FEATURES, MODEL_NAMES, POLICY, validate_model_parameters
 from reviewwise.data import fingerprint
 
 
@@ -38,7 +38,8 @@ def load_manifest(directory, data_path):
     manifest = read_json(directory / "manifest.json")
     if manifest.get("schema_version") != 1 or manifest.get("features") != FEATURES:
         raise ValueError("Artifact schema or feature list is incompatible with this code.")
-    if manifest.get("model_parameters") != MODEL_PARAMETERS or manifest.get("policy") != POLICY:
+    validate_model_parameters(manifest.get("model_parameters"))
+    if manifest.get("policy") != POLICY:
         raise ValueError("Configuration changed since training. Do not reuse stale evaluation artifacts.")
     if manifest.get("selected_model") not in MODEL_NAMES:
         raise ValueError("Manifest has an invalid selected model.")

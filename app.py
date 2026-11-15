@@ -1,11 +1,15 @@
-"""A historical review-budget demo. Train/evaluate separately before launching."""
+"""Historical review-budget demo with optional isolated model experiments."""
+
+from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from sklearn.exceptions import ConvergenceWarning
 
 from reviewwise.artifacts import load_evaluation, read_json
-from reviewwise.config import DISPLAY_NAMES, ROOT
+from reviewwise.config import DISPLAY_NAMES, ROOT, experiment_parameters
+from reviewwise.experiments import run_experiment
 from reviewwise.ranking import rank_order, review_count
 
 st.set_page_config(page_title="ReviewWise | Make every review count", page_icon="◈", layout="wide")
@@ -30,6 +34,46 @@ RESULTS = ROOT / "results"
 DATA = ROOT / "data/creditcard.csv"
 
 
+with st.sidebar:
+    st.header("Model experiments")
+    st.caption("Fit on training rows; choose the winner by validation recall at 1%. "
+               "Class balancing and the chronological split stay fixed.")
+    st.caption("Move the sliders, then submit. The same settings reproduce the same experiment.")
+    st.warning("The existing test results have already been seen. These runs are exploratory; "
+               "use new untouched data to confirm an improvement.")
+    with st.form("retraining_controls"):
+        log10_c = st.slider("Logistic regression · log10 C", -3.0, 2.0, 0.0, 0.5,
+                           key="experiment_log10_c",
+                           help="Smaller C applies stronger regularization. C = 10 raised to this value.")
+        trees = st.slider("Random forest · trees", 50, 400, 200, 50, key="experiment_trees")
+        depth = st.slider("Random forest · maximum depth", 3, 20, 12, key="experiment_depth")
+        leaf = st.slider("Random forest · minimum leaf size", 1, 20, 5, key="experiment_leaf")
+        retrain = st.form_submit_button("Retrain models", type="primary", disabled=not DATA.is_file())
+    if not DATA.is_file():
+        st.info("Add data/creditcard.csv locally to enable retraining.")
+    if retrain:
+        try:
+            with st.spinner("Training both models and preparing the frozen evaluation. This may take several minutes..."):
+                paths = run_experiment(DATA, ROOT / "tmp" / "web_runs",
+                                       experiment_parameters(log10_c, trees, depth, leaf))
+            # Only activate a run after training and evaluation both succeed.
+            st.session_state["experiment_paths"] = tuple(str(path) for path in paths)
+            st.session_state["revealed"] = False
+            st.success("Run complete. The demo now uses the new frozen models.")
+        except (ValueError, OSError, KeyError, ConvergenceWarning) as error:
+            st.error(f"Retraining stopped: {error}")
+            st.caption("The previously active run is still selected.")
+    if "experiment_paths" in st.session_state:
+        if st.button("Return to original saved run"):
+            del st.session_state["experiment_paths"]
+            st.session_state["revealed"] = False
+    if "experiment_paths" in st.session_state:
+        ARTIFACTS, RESULTS = map(Path, st.session_state["experiment_paths"])
+        st.caption(f"Active experiment: {ARTIFACTS.parent.name}")
+    else:
+        st.caption("Active run: original saved artifacts.")
+
+
 def artifact_signature():
     paths = [DATA, *ARTIFACTS.glob("*"), *RESULTS.glob("*")]
     return tuple((str(path), path.stat().st_size, path.stat().st_mtime_ns)
@@ -37,10 +81,11 @@ def artifact_signature():
 
 
 @st.cache_data(show_spinner="Checking the frozen batch...")
-def load_batch(signature):
+def load_batch(signature, artifacts_path, results_path):
     # The signature invalidates this cache when data or artifacts change.
-    manifest, evidence = load_evaluation(ARTIFACTS, RESULTS, DATA)
-    predictions = pd.read_csv(ARTIFACTS / "predictions.csv")
+    artifacts_path, results_path = Path(artifacts_path), Path(results_path)
+    manifest, evidence = load_evaluation(artifacts_path, results_path, DATA)
+    predictions = pd.read_csv(artifacts_path / "predictions.csv")
     if "Class" in predictions or predictions.transaction_id.duplicated().any():
         raise ValueError("Prediction artifact must have unique IDs and no historical labels.")
     if len(predictions) != evidence["batch"]["rows"]:
@@ -80,7 +125,7 @@ st.markdown('<span class="status">OFFLINE PROTOTYPE · NO PAYMENTS ARE BLOCKED</
 
 try:
     signature = artifact_signature()
-    manifest, evidence, predictions = load_batch(signature)
+    manifest, evidence, predictions = load_batch(signature, str(ARTIFACTS), str(RESULTS))
 except (ValueError, OSError, KeyError) as error:
     st.error(str(error))
     st.info("Prepare the local demo by running these commands from the project folder.")
@@ -220,6 +265,8 @@ if revealed:
     with st.expander("Full evaluation and model selection"):
         st.write(f"Selected before test evaluation: **{selected_name}**. "
                  "The selection criterion was validation recall at 1%; ties favor logistic regression.")
+        st.write("**Settings used by the active run**")
+        st.json(manifest["model_parameters"])
         validation = pd.DataFrame(manifest["validation"]).T
         st.dataframe(validation[["k", "fraud", "tp", "fp", "fn", "precision", "recall"]], width="stretch")
         all_results = pd.DataFrame([r for r in evidence["metrics"] if r["capacity_units"] == 10])

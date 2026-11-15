@@ -5,6 +5,14 @@ Status: local pipeline, frozen evaluation, demo, and documentation implemented.
 primary validation queues. Browser visual verification remains incomplete.
 PROJECT.md is the implementation contract; COMPETITION.MD records the brief.
 
+## Interactive experiment addition
+
+- Added four bounded hyperparameter sliders and explicit retraining in the sidebar.
+- Preserve original artifacts; activate only completed isolated runs.
+- Record and validate custom settings while retaining original artifact support.
+- Added synthetic end-to-end tests for training, UI activation, failure, and restore.
+- These experiments are exploratory; original measured results remain unchanged.
+
 ## Implemented layout
 
 ```text

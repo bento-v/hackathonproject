@@ -59,6 +59,9 @@ def evaluate(data_path, directory, results_dir):
     for name in MODEL_NAMES:
         # Files are generated locally and verified against the training manifest.
         model = joblib.load(directory / f"{name}.joblib")
+        estimator = model[-1] if name == "logistic_regression" else model
+        if any(estimator.get_params()[key] != value for key, value in manifest["model_parameters"][name].items()):
+            raise ValueError(f"{name} parameters differ from the frozen manifest.")
         if list(model.feature_names_in_) != FEATURES:
             raise ValueError(f"{name} has an incompatible feature list.")
         predictions[name] = model.predict_proba(test[FEATURES])[:, 1]

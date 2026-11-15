@@ -27,6 +27,22 @@ recall at 1%: 49/57 versus 48/57. We froze logistic regression before evaluating
 the test set. All settings were specified in advance; there was no tuning
 against test results. See [the specification](PROJECT.md).
 
+## Interactive model experiments
+
+The sidebar has sliders for logistic regularization and random-forest tree
+count, depth, and minimum leaf size. Click **Retrain models** to fit both
+models on training rows, select by validation recall at 1%, and evaluate the
+frozen run. Class balancing remains fixed. Smaller C means stronger
+regularization; more trees do not guarantee a better ranking.
+
+Each experiment is saved locally under `tmp/web_runs/` and becomes the active
+demo only after success. **Return to original saved run** restores the baseline.
+The dataset must exist locally. See [Mac instructions](REPRODUCING.md#mac-web-experiments).
+Repeated experiments are exploratory because the original test outcomes have
+already been examined. No improvement is claimed without new measurements
+and an untouched evaluation dataset. The results below belong to the original
+baseline, not to newly trained slider settings.
+
 ## Measured results
 
 On the held-out test batch, **570 reviews caught 65 of 75 frauds with the selected

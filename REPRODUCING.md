@@ -104,3 +104,44 @@ It does not deduplicate, infer customer identity, or establish data independence
 The tests use Streamlit's official AppTest interface. Local artifact integration
 tests skip in a clean checkout until training and evaluation are complete.
 No user usability study or external deployment test has been performed.
+
+## Mac web experiments
+
+From the downloaded project folder with the dataset at `data/creditcard.csv`:
+
+```bash
+source .venv/bin/activate
+python -m streamlit run app.py
+```
+
+Open http://localhost:8501. Expand the left sidebar if it is collapsed. Change
+the sliders and click **Retrain models**. Wait for completion; on the full CSV
+this may take several minutes. Changing sliders or the review budget alone
+does not train. The button works even when no original fitted models exist,
+provided the CSV and dependencies are available. With no CSV it is disabled.
+
+Controls: log10(C) -3 to 2 (C 0.001 to 100); forest trees 50 to 400, maximum
+depth 3 to 20, minimum leaf size 1 to 20. Defaults match the original baseline.
+Class balancing remains fixed. Training fits preprocessing on training rows
+only, chooses between the two candidates on validation recall at 1%, freezes
+the models, then calculates test evidence. Test scores never choose the winner.
+
+Successful runs live in `tmp/web_runs/<unique-run-id>/artifacts` and `results`.
+Actual fitted settings are recorded in the manifest and displayed under
+**Full evaluation and model selection**. Original `artifacts/` and `results/`
+are not overwritten. Failed runs do not replace the active demo. Use
+**Return to original saved run** to switch back. The active selection is per
+browser session; restarting the app returns to the original saved run. If
+there are no original artifacts, that return shows the normal setup message.
+The run files remain on disk until removed. Keep `tmp/` out of Git.
+
+Changing sliders is a manual validation experiment, not an automatic search.
+The already-inspected historical test set is exploratory evidence for these
+runs; freeze a candidate and use new untouched data to confirm improvement.
+
+New synthetic-data tests exercise real custom training/evaluation and web
+controls without requiring the downloaded dataset or existing artifacts:
+
+```bash
+python -m unittest discover -s tests -v
+```

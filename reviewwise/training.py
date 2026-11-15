@@ -13,16 +13,17 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from reviewwise.artifacts import versions, write_json
-from reviewwise.config import FEATURES, MODEL_PARAMETERS, POLICY, ROOT
+from reviewwise.config import FEATURES, MODEL_PARAMETERS, POLICY, ROOT, validate_model_parameters
 from reviewwise.data import audit_data, fingerprint, load_data, split_data, temporal_edges
 from reviewwise.ranking import counts, selection
 
 
-def build_models():
+def build_models(parameters=None):
+    parameters = validate_model_parameters(MODEL_PARAMETERS if parameters is None else parameters)
     return {
         "logistic_regression": make_pipeline(
-            StandardScaler(), LogisticRegression(**MODEL_PARAMETERS["logistic_regression"])),
-        "random_forest": RandomForestClassifier(**MODEL_PARAMETERS["random_forest"]),
+            StandardScaler(), LogisticRegression(**parameters["logistic_regression"])),
+        "random_forest": RandomForestClassifier(**parameters["random_forest"]),
     }
 
 
@@ -32,7 +33,8 @@ def choose_model(validation):
             validation["logistic_regression"]["recall"] else "logistic_regression")
 
 
-def train(data_path, directory, results_dir):
+def train(data_path, directory, results_dir, parameters=None):
+    parameters = validate_model_parameters(MODEL_PARAMETERS if parameters is None else parameters)
     directory, results_dir = Path(directory), Path(results_dir)
     if (directory / "manifest.json").exists():
         raise ValueError("A frozen training manifest already exists. Use a new --artifacts directory for a documented new run.")
@@ -43,7 +45,7 @@ def train(data_path, directory, results_dir):
     splits = split_data(data)
     audit = audit_data(data, splits)
     training, validation = splits["train"], splits["validation"]
-    models, validation_results, hashes = build_models(), {}, {}
+    models, validation_results, hashes = build_models(parameters), {}, {}
     for name, model in models.items():
         print(f"Fitting {name} on {len(training):,} training rows...", flush=True)
         with warnings.catch_warnings():
@@ -60,8 +62,9 @@ def train(data_path, directory, results_dir):
         raise ValueError("Dataset changed during training; no manifest was frozen.")
     manifest = {
         "schema_version": 1, "created_utc": datetime.now(timezone.utc).isoformat(),
+        "run_kind": "baseline" if parameters == MODEL_PARAMETERS else "parameter_experiment",
         "input_sha256": before_hash, "features": FEATURES, "versions": versions(),
-        "model_parameters": MODEL_PARAMETERS, "policy": POLICY,
+        "model_parameters": parameters, "policy": POLICY,
         "selected_model": winner, "validation": validation_results,
         "audit": audit, "temporal_edges": temporal_edges(splits["test"]),
         "model_files": hashes,

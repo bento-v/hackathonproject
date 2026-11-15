@@ -91,8 +91,20 @@ select logistic regression for simplicity. Freeze the selected model,
 features, parameters, preprocessing, and evaluation policy before evaluating
 test performance. Keep the training-fitted models; do not refit on validation.
 
-No parameter search is planned. Any later validation-only experiment must be
-recorded before final test evaluation. Never tune against test outcomes.
+The original baseline uses the fixed settings above. The web interface now
+supports explicit parameter experiments: logistic log10(C) from -3 to 2 in
+steps of 0.5; forest trees from 50 to 400 in steps of 50, maximum depth from
+3 to 20, and minimum leaf size from 1 to 20. All other parameters, including
+balanced class weights and seed, remain fixed. Sliders do not start training;
+the Retrain models form submission fits both candidates and selects on
+validation recall at 1%, then evaluates the frozen winner and candidates.
+Each run records its actual parameters in a separate tmp/web_runs directory.
+Only a fully trained and evaluated run becomes active; failure preserves the
+previous active run. Users can return to the original artifacts. Outcomes reset
+to hidden on successful retraining and when returning to the original run.
+These experiments happen after the original test results were inspected and
+must be labeled exploratory. New untouched data is needed to confirm any
+improvement. Never automatically optimize against test outcomes.
 
 ## Baselines and review policy
 
