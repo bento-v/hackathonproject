@@ -17,17 +17,36 @@ from reviewwise.ranking import rank_order, review_count
 st.set_page_config(page_title="ReviewWise | Make every review count", page_icon="◈", layout="wide")
 st.markdown("""
 <style>
-  .block-container {max-width: 1280px; padding-top: 2.5rem; padding-bottom: 3rem;}
-  h1 {letter-spacing: -.055em; font-weight: 650 !important;}
+  .block-container {max-width: 1280px; padding-top: 2.7rem; padding-bottom: 3rem;}
+  h1 {letter-spacing: -.055em; font-weight: 700 !important; line-height: 1.12 !important;}
   h2, h3 {letter-spacing: -.025em;}
-  .eyebrow {font-size: .76rem; letter-spacing: .16em; font-weight: 700; color: #136B50;}
-  .lede {font-size: 1.12rem; color: #52645D; max-width: 730px; line-height: 1.6;}
-  .status {display: inline-block; border: 1px solid #CCD9D0; border-radius: 999px;
-           padding: .3rem .7rem; font-size: .72rem; color: #476056; margin-bottom: 1rem;}
+  .eyebrow {font-size: .72rem; letter-spacing: .18em; font-weight: 750; color: #136B50;
+            border-left: 3px solid #136B50; padding-left: .75rem; margin-bottom: .6rem;}
+  .lede {font-size: 1.08rem; color: #52645D; max-width: 730px; line-height: 1.65;}
+  .status {display: inline-flex; align-items: center; gap: .45rem;
+           border: 1px solid #D3E2D9; background: #EEF5EF; border-radius: 999px;
+           padding: .4rem .8rem; font-size: .7rem; letter-spacing: .055em;
+           color: #365D4D; margin-bottom: 1rem;}
+  .status::before {content: ""; width: 6px; height: 6px; background: #136B50; border-radius: 50%;}
   [data-testid="stMetric"] {background: #FFFFFF; border: 1px solid #DDE5DB;
-                           border-radius: 12px; padding: 1rem 1.2rem;}
-  [data-testid="stMetricValue"] {font-variant-numeric: tabular-nums;}
-  div[data-testid="stButton"] button {border-radius: 8px;}
+                           border-radius: 14px; padding: 1rem 1.2rem;
+                           box-shadow: 0 3px 12px rgba(21,45,39,.035);}
+  [data-testid="stMetricLabel"] {color: #52645D;}
+  [data-testid="stMetricValue"] {font-variant-numeric: tabular-nums; letter-spacing: -.04em;}
+  [data-testid="stSidebar"] {border-right: 1px solid #DDE5DB;}
+  [data-testid="stSidebar"] h2 {font-size: 1.25rem;}
+  [data-testid="stDataFrame"] {border-radius: 10px; overflow: hidden;}
+  div[data-testid="stButton"] button, div[data-testid="stFormSubmitButton"] button {
+      border-radius: 10px; min-height: 2.7rem; font-weight: 600;}
+  button:focus-visible {outline: 3px solid #83AF9D !important; outline-offset: 3px;}
+  .queue-label {font-size: .7rem; font-weight: 700; letter-spacing: .12em; margin: .15rem 0 .55rem;}
+  .queue-label.model {color: #136B50;}
+  .queue-label.baseline {color: #916326;}
+  @media (max-width: 640px) {
+    .block-container {padding-top: 1.5rem; padding-left: 1rem; padding-right: 1rem;}
+    [data-testid="stMetric"] {padding: .8rem;}
+    .lede {font-size: 1rem;}
+  }
 </style>
 """, unsafe_allow_html=True)
 
@@ -42,6 +61,9 @@ DATA = ROOT / "data/creditcard.csv"
 
 
 with st.sidebar:
+    st.markdown("**◈ ReviewWise**")
+    st.caption("HISTORICAL REVIEW WORKSPACE")
+    st.divider()
     st.header("Model experiments")
     st.caption("Fit on training rows; choose the winner by validation recall at 1%. "
                "Class balancing and the chronological split stay fixed.")
@@ -213,10 +235,13 @@ else:
 
 left, right = st.columns(2, gap="large")
 for column, method, title, note in (
-    (left, selected_model, "01 / Model-ranked queue", f"{selected_name} · selected on validation data"),
-    (right, "amount", "02 / Largest-payment queue", "Simple rule · descending payment amount"),
+    (left, selected_model, "Model-ranked queue", f"{selected_name} · selected on validation data"),
+    (right, "amount", "Largest-payment queue", "Simple rule · descending payment amount"),
 ):
-    with column:
+    with column, st.container(border=True):
+        badge_class = "model" if method != "amount" else "baseline"
+        badge_text = "01 / LEARNED RANKING" if method != "amount" else "02 / SIMPLE BASELINE"
+        st.markdown(f'<div class="queue-label {badge_class}">{badge_text}</div>', unsafe_allow_html=True)
         st.subheader(title)
         st.caption(note)
         st.dataframe(queue_view(predictions, method, k, labels), hide_index=True,
@@ -240,7 +265,11 @@ if revealed:
                     hover_data={"k": True, "tp": True, "fp": True}, template="plotly_white")
     chart.add_vline(x=capacity_units / 10, line_dash="dot", line_color="#84968C")
     chart.update_layout(height=320, margin=dict(l=10, r=10, t=20, b=10),
-                        legend=dict(orientation="h", y=1.18), paper_bgcolor="rgba(0,0,0,0)")
+                        legend=dict(orientation="h", y=1.18, title_text=""),
+                        font=dict(color="#365D4D"), hovermode="x unified",
+                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+    chart.update_traces(line=dict(width=3))
+    chart.update_xaxes(showgrid=False)
     chart.update_yaxes(range=[0, 100])
     st.plotly_chart(chart, width="stretch")
     capacity_table = pd.DataFrame([r for r in evidence["metrics"] if r["method"] == selected_model])
