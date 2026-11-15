@@ -15,6 +15,8 @@ def review_count(n, capacity_units):
 
 def rank_order(scores, ids):
     scores, ids = np.asarray(scores), np.asarray(ids)
+    if scores.ndim != 1 or ids.ndim != 1:
+        raise ValueError("Scores and transaction IDs must be one-dimensional vectors.")
     if len(scores) != len(ids) or len(set(ids)) != len(ids):
         raise ValueError("Scores require an equal-length vector of unique transaction IDs.")
     if not np.isfinite(scores).all():
@@ -30,6 +32,8 @@ def selection(scores, ids, capacity_units):
 
 def counts(labels, selected):
     labels, selected = np.asarray(labels), np.asarray(selected, dtype=bool)
+    if labels.ndim != 1 or selected.ndim != 1:
+        raise ValueError("Labels and selections must be one-dimensional vectors.")
     if len(labels) != len(selected) or not np.isin(labels, [0, 1]).all():
         raise ValueError("Metrics require aligned binary labels and selections.")
     fraud = labels == 1
@@ -75,3 +79,4 @@ def temporal_results(labels, times, selected, edges):
          **counts(labels[windows == i], selected[windows == i])}
         for i in range(3)
     ]
+

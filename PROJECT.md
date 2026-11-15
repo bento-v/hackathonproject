@@ -97,9 +97,9 @@ steps of 0.5; forest trees from 50 to 400 in steps of 50, maximum depth from
 3 to 20, and minimum leaf size from 1 to 20. All other parameters, including
 balanced class weights and seed, remain fixed. Sliders do not start training;
 the Retrain models form submission fits both candidates and selects on
-validation recall at 1%, then evaluates the frozen winner and candidates.
+validation recall at 1%, then displays validation results. A separate explicit button evaluates the frozen winner and candidates.
 Each run records its actual parameters in a separate tmp/web_runs directory.
-Only a fully trained and evaluated run becomes active; failure preserves the
+Validation-only runs remain pending. Only a fully trained and explicitly evaluated run becomes active; failure preserves the
 previous active run. Users can return to the original artifacts. Outcomes reset
 to hidden on successful retraining and when returning to the original run.
 These experiments happen after the original test results were inspected and
@@ -236,3 +236,11 @@ by 6:59 PM Pacific; check link access in a private window.
 
 Required disclaimer:
 "This project is a prototype and is not financial advice."
+
+
+## Validation and demo update
+
+Sidebar experiments stop after validation; explicit test evaluation activates a run.
+Expanding-window and unseen-vector audits are available in reviewwise.validation_audit.
+Synthetic practice mode is isolated under tmp/synthetic_demo and visibly labeled.
+QUICKSTART.md covers setup and presentation; GitHub Actions runs automated checks.

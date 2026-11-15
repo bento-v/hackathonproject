@@ -12,7 +12,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from reviewwise.artifacts import versions, write_json
+from reviewwise.artifacts import read_json, versions, write_json
 from reviewwise.config import FEATURES, MODEL_PARAMETERS, POLICY, ROOT, validate_model_parameters
 from reviewwise.data import audit_data, fingerprint, load_data, split_data, temporal_edges
 from reviewwise.ranking import counts, selection
@@ -43,6 +43,7 @@ def train(data_path, directory, results_dir, parameters=None):
     before_hash = fingerprint(data_path)
     data = load_data(data_path)
     splits = split_data(data)
+    edges = temporal_edges(splits["test"])
     audit = audit_data(data, splits)
     training, validation = splits["train"], splits["validation"]
     models, validation_results, hashes = build_models(parameters), {}, {}
@@ -66,7 +67,7 @@ def train(data_path, directory, results_dir, parameters=None):
         "input_sha256": before_hash, "features": FEATURES, "versions": versions(),
         "model_parameters": parameters, "policy": POLICY,
         "selected_model": winner, "validation": validation_results,
-        "audit": audit, "temporal_edges": temporal_edges(splits["test"]),
+        "audit": audit, "temporal_edges": edges,
         "model_files": hashes,
     }
     # Membership is recorded locally, not published as a row-level export.
@@ -87,12 +88,21 @@ def main():
     parser.add_argument("--data", type=Path, default=ROOT / "data/creditcard.csv")
     parser.add_argument("--artifacts", type=Path, default=ROOT / "artifacts")
     parser.add_argument("--results", type=Path, default=ROOT / "results")
+    parser.add_argument("--tuning-report", type=Path,
+                        help="Use model settings from a validation-only search report.")
     args = parser.parse_args()
     try:
-        train(args.data, args.artifacts, args.results)
+        parameters = None
+        if args.tuning_report:
+            report = read_json(args.tuning_report)
+            if report.get("input_sha256") != fingerprint(args.data):
+                raise ValueError("Tuning report belongs to a different dataset.")
+            parameters = validate_model_parameters(report.get("model_parameters"))
+        train(args.data, args.artifacts, args.results, parameters=parameters)
     except (ValueError, FileNotFoundError, ConvergenceWarning) as error:
         parser.exit(1, f"Training stopped: {error}\n")
 
 
 if __name__ == "__main__":
     main()
+

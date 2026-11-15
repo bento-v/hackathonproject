@@ -53,6 +53,8 @@ class ExperimentTests(unittest.TestCase):
             second = run_experiment(self.data, self.root / "runs", parameters)
         self.assertNotEqual(first, second)
         self.assertEqual(fingerprint(first[0] / "manifest.json"), before)
+        self.assertFalse((second[0] / "evaluation_index.json").exists())
+        evaluate(self.data, *second)
         manifest, evidence = load_evaluation(*second, self.data)
         self.assertEqual(manifest["model_parameters"], parameters)
         model = joblib.load(second[0] / "logistic_regression.joblib")
@@ -84,6 +86,11 @@ class ExperimentTests(unittest.TestCase):
             self.assertEqual(len(app.error), 0)
             self.assertEqual(runner.call_count, 1)
             self.assertFalse(app.session_state["revealed"])
+            pending = app.session_state["pending_paths"]
+            self.assertFalse((Path(pending[0]) / "evaluation_index.json").exists())
+            self.assertNotIn("experiment_paths", app.session_state)
+            button(app, "Evaluate frozen run on test batch").click().run()
+            self.assertEqual(len(app.exception), 0)
             active = app.session_state["experiment_paths"]
             manifest, _ = load_evaluation(*active, self.data)
             self.assertEqual(manifest["model_parameters"]["logistic_regression"]["C"], 0.1)
@@ -103,3 +110,4 @@ class ExperimentTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

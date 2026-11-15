@@ -29,19 +29,26 @@ against test results. See [the specification](PROJECT.md).
 
 ## Interactive model experiments
 
-The sidebar has sliders for logistic regularization and random-forest tree
-count, depth, and minimum leaf size. Click **Retrain models** to fit both
-models on training rows, select by validation recall at 1%, and evaluate the
-frozen run. Class balancing remains fixed. Smaller C means stronger
-regularization; more trees do not guarantee a better ranking.
+The nine-configuration validation search has now been run on the public dataset.
+It found no improvement over baseline logistic regression at 1% capacity:
+49/57 validation frauds caught with 570 reviews. See
+[measured tuning results](TUNING_RESULTS.md) for every candidate and runtime details.
 
-Each experiment is saved locally under `tmp/web_runs/` and becomes the active
-demo only after success. **Return to original saved run** restores the baseline.
-The dataset must exist locally. See [Mac instructions](REPRODUCING.md#mac-web-experiments).
-Repeated experiments are exploratory because the original test outcomes have
-already been examined. No improvement is claimed without new measurements
-and an untouched evaluation dataset. The results below belong to the original
-baseline, not to newly trained slider settings.
+For validation-only parameter search and the latest code review, see
+[REVIEW.md](REVIEW.md). This workflow avoids scoring test rows during search.
+
+The sidebar trains models and shows validation results first. A separate
+**Evaluate frozen run on test batch** button evaluates and activates a frozen
+experiment. Failed training or evaluation preserves the active demo. Existing
+test results have already been examined, so experiments remain exploratory.
+
+See [QUICKSTART.md](QUICKSTART.md) for cross-platform setup, a clearly labeled
+synthetic demo, validation audits, and a two-minute presentation guide.
+
+The baseline scored 76.9%, 89.2%, and 86.5% recall in three expanding chronological
+validation windows. Excluding feature vectors seen in training did not change
+frauds caught in these windows. This is a descriptive robustness check, not
+independent confirmation. See [audit metrics](results/validation_audit.json).
 
 ## Measured results
 
@@ -112,3 +119,4 @@ OpenAI [Codex](https://openai.com/codex/) assisted with planning, implementation
 testing, and documentation; official library documentation informed API use.
 The student must review and understand the implementation before submission.
 Team details are supplied in the submission form; they have not been entered here.
+

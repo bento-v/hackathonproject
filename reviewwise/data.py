@@ -84,6 +84,8 @@ def describe_splits(splits):
 
 
 def temporal_edges(test):
+    if test["Time"].nunique() < 2:
+        raise ValueError("Test split needs at least two distinct timestamps for temporal analysis.")
     return np.linspace(test["Time"].min(), test["Time"].max(), 4).tolist()
 
 
@@ -111,3 +113,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

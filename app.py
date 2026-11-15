@@ -1,6 +1,7 @@
 """Historical review-budget demo with optional isolated model experiments."""
 
 from pathlib import Path
+import os
 
 import pandas as pd
 import plotly.express as px
@@ -10,6 +11,7 @@ from sklearn.exceptions import ConvergenceWarning
 from reviewwise.artifacts import load_evaluation, read_json
 from reviewwise.config import DISPLAY_NAMES, ROOT, experiment_parameters
 from reviewwise.experiments import run_experiment
+from reviewwise.evaluation import evaluate
 from reviewwise.ranking import rank_order, review_count
 
 st.set_page_config(page_title="ReviewWise | Make every review count", page_icon="◈", layout="wide")
@@ -28,6 +30,11 @@ st.markdown("""
   div[data-testid="stButton"] button {border-radius: 8px;}
 </style>
 """, unsafe_allow_html=True)
+
+SYNTHETIC = os.environ.get("REVIEWWISE_SYNTHETIC_DEMO") == "1"
+if SYNTHETIC:
+    ROOT = ROOT / "tmp" / "synthetic_demo"
+    st.warning("SYNTHETIC DEMO — invented transactions for interface practice. These results are not real fraud-detection evidence.")
 
 ARTIFACTS = ROOT / "artifacts"
 RESULTS = ROOT / "results"
@@ -53,16 +60,33 @@ with st.sidebar:
         st.info("Add data/creditcard.csv locally to enable retraining.")
     if retrain:
         try:
-            with st.spinner("Training both models and preparing the frozen evaluation. This may take several minutes..."):
+            with st.spinner("Training and comparing validation results. This may take several minutes..."):
                 paths = run_experiment(DATA, ROOT / "tmp" / "web_runs",
                                        experiment_parameters(log10_c, trees, depth, leaf))
-            # Only activate a run after training and evaluation both succeed.
-            st.session_state["experiment_paths"] = tuple(str(path) for path in paths)
+            # Keep validation experiments separate from the historical demo.
+            st.session_state["pending_paths"] = tuple(str(path) for path in paths)
             st.session_state["revealed"] = False
-            st.success("Run complete. The demo now uses the new frozen models.")
+            st.success("Validation complete. Review results below before evaluating the frozen run.")
         except (ValueError, OSError, KeyError, ConvergenceWarning) as error:
             st.error(f"Retraining stopped: {error}")
             st.caption("The previously active run is still selected.")
+    if "pending_paths" in st.session_state:
+        pending = tuple(Path(path) for path in st.session_state["pending_paths"])
+        validation_report = read_json(pending[0] / "manifest.json")
+        st.subheader("Validation results")
+        st.dataframe(pd.DataFrame(validation_report["validation"]).T[
+            ["tp", "fp", "fn", "precision", "recall"]])
+        st.caption("Winner: " + DISPLAY_NAMES[validation_report["selected_model"]])
+        st.caption("Test evaluation is a separate final step. Previously seen test results remain exploratory.")
+        if st.button("Evaluate frozen run on test batch"):
+            try:
+                with st.spinner("Evaluating the frozen run..."):
+                    evaluate(DATA, *pending)
+                st.session_state["experiment_paths"] = tuple(str(path) for path in pending)
+                del st.session_state["pending_paths"]
+                st.session_state["revealed"] = False
+            except (ValueError, OSError, KeyError) as error:
+                st.error(f"Evaluation stopped: {error}")
     if "experiment_paths" in st.session_state:
         if st.button("Return to original saved run"):
             del st.session_state["experiment_paths"]
@@ -220,6 +244,13 @@ if revealed:
     chart.update_yaxes(range=[0, 100])
     st.plotly_chart(chart, width="stretch")
     capacity_table = pd.DataFrame([r for r in evidence["metrics"] if r["method"] == selected_model])
+    capacity_table = capacity_table.sort_values("capacity_units")
+    capacity_table["Extra reviews"] = capacity_table.k.diff()
+    capacity_table["Extra frauds caught"] = capacity_table.tp.diff()
+    st.caption("Compare each budget with the next smaller budget: extra reviews include both fraud and legitimate payments.")
+    st.dataframe(capacity_table[["capacity_units", "Extra reviews", "Extra frauds caught"]].assign(
+        capacity_units=capacity_table.capacity_units / 10).rename(columns={"capacity_units": "Budget (%)"}),
+        hide_index=True, width="stretch")
     capacity_table["Budget"] = capacity_table.capacity_units.map(lambda v: f"{v / 10:g}%")
     st.dataframe(capacity_table[["Budget", "k", "tp", "fp", "fn"]].rename(columns={
         "k": "Reviews", "tp": "Fraud caught", "fp": "Legitimate reviews", "fn": "Fraud missed"}),
@@ -289,3 +320,4 @@ st.caption("This public dataset covers two days in 2013. Its anonymous features 
 st.caption("This project is a prototype and is not financial advice.")
 st.markdown("[Dataset and attribution](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) · "
             "Local historical evaluation · Built with Python, scikit-learn, Streamlit, Plotly, and Codex")
+

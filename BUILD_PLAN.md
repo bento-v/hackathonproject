@@ -137,3 +137,11 @@ If time gets tight, preserve correct evaluation, equal-budget comparison,
 the temporal check, one working reveal flow, and the README. Reduce styling
 and secondary charts first. Do not add models or integrations to compensate
 for an unclear result. Keep every performance claim tied to the frozen evidence in results/.
+
+
+## Validation and demo update
+
+Sidebar experiments stop after validation; explicit test evaluation activates a run.
+Expanding-window and unseen-vector audits are available in reviewwise.validation_audit.
+Synthetic practice mode is isolated under tmp/synthetic_demo and visibly labeled.
+QUICKSTART.md covers setup and presentation; GitHub Actions runs automated checks.

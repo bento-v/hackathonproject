@@ -47,7 +47,7 @@ class FrozenRunTests(unittest.TestCase):
             for frame in app.dataframe:
                 self.assertNotIn("Historical outcome", frame.value)
                 self.assertEqual(len(frame.value), review_count(evidence["batch"]["rows"], capacity))
-            app.button[0].click().run()
+            next(button for button in app.button if button.label == "Reveal historical outcomes").click().run()
             self.assertEqual(len(app.exception), 0)
             self.assertTrue(app.session_state["revealed"])
             self.assertIn("Historical outcome", app.dataframe[0].value)
@@ -58,3 +58,4 @@ class FrozenRunTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

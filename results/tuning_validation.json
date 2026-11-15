@@ -1,0 +1,268 @@
+{
+  "candidates": [
+    {
+      "average_precision": 0.7723236882981208,
+      "fn": 8,
+      "fp": 521,
+      "fraud": 57,
+      "k": 570,
+      "model": "logistic_regression",
+      "n": 56964,
+      "parameters": {
+        "C": 1.0,
+        "class_weight": "balanced",
+        "max_iter": 2000,
+        "random_state": 42,
+        "solver": "lbfgs"
+      },
+      "pr_auc_trapezoidal": 0.7719221786531016,
+      "precision": 0.08596491228070176,
+      "recall": 0.8596491228070176,
+      "tn": 56386,
+      "tp": 49
+    },
+    {
+      "average_precision": 0.7460193720623787,
+      "fn": 8,
+      "fp": 521,
+      "fraud": 57,
+      "k": 570,
+      "model": "logistic_regression",
+      "n": 56964,
+      "parameters": {
+        "C": 0.01,
+        "class_weight": "balanced",
+        "max_iter": 2000,
+        "random_state": 42,
+        "solver": "lbfgs"
+      },
+      "pr_auc_trapezoidal": 0.7453489678076998,
+      "precision": 0.08596491228070176,
+      "recall": 0.8596491228070176,
+      "tn": 56386,
+      "tp": 49
+    },
+    {
+      "average_precision": 0.7691150583599146,
+      "fn": 8,
+      "fp": 521,
+      "fraud": 57,
+      "k": 570,
+      "model": "logistic_regression",
+      "n": 56964,
+      "parameters": {
+        "C": 0.1,
+        "class_weight": "balanced",
+        "max_iter": 2000,
+        "random_state": 42,
+        "solver": "lbfgs"
+      },
+      "pr_auc_trapezoidal": 0.7686763420850663,
+      "precision": 0.08596491228070176,
+      "recall": 0.8596491228070176,
+      "tn": 56386,
+      "tp": 49
+    },
+    {
+      "average_precision": 0.7724919171533826,
+      "fn": 8,
+      "fp": 521,
+      "fraud": 57,
+      "k": 570,
+      "model": "logistic_regression",
+      "n": 56964,
+      "parameters": {
+        "C": 10.0,
+        "class_weight": "balanced",
+        "max_iter": 2000,
+        "random_state": 42,
+        "solver": "lbfgs"
+      },
+      "pr_auc_trapezoidal": 0.7720915991194796,
+      "precision": 0.08596491228070176,
+      "recall": 0.8596491228070176,
+      "tn": 56386,
+      "tp": 49
+    },
+    {
+      "average_precision": 0.7724843655727185,
+      "fn": 8,
+      "fp": 521,
+      "fraud": 57,
+      "k": 570,
+      "model": "logistic_regression",
+      "n": 56964,
+      "parameters": {
+        "C": 100.0,
+        "class_weight": "balanced",
+        "max_iter": 2000,
+        "random_state": 42,
+        "solver": "lbfgs"
+      },
+      "pr_auc_trapezoidal": 0.7720841015773707,
+      "precision": 0.08596491228070176,
+      "recall": 0.8596491228070176,
+      "tn": 56386,
+      "tp": 49
+    },
+    {
+      "average_precision": 0.7666063009666276,
+      "fn": 9,
+      "fp": 522,
+      "fraud": 57,
+      "k": 570,
+      "model": "random_forest",
+      "n": 56964,
+      "parameters": {
+        "class_weight": "balanced_subsample",
+        "max_depth": 12,
+        "min_samples_leaf": 5,
+        "n_estimators": 200,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "pr_auc_trapezoidal": 0.7660284336661981,
+      "precision": 0.08421052631578947,
+      "recall": 0.8421052631578947,
+      "tn": 56385,
+      "tp": 48
+    },
+    {
+      "average_precision": 0.7705879868565155,
+      "fn": 9,
+      "fp": 522,
+      "fraud": 57,
+      "k": 570,
+      "model": "random_forest",
+      "n": 56964,
+      "parameters": {
+        "class_weight": "balanced_subsample",
+        "max_depth": 8,
+        "min_samples_leaf": 5,
+        "n_estimators": 200,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "pr_auc_trapezoidal": 0.7701641346978341,
+      "precision": 0.08421052631578947,
+      "recall": 0.8421052631578947,
+      "tn": 56385,
+      "tp": 48
+    },
+    {
+      "average_precision": 0.7594320190885215,
+      "fn": 9,
+      "fp": 522,
+      "fraud": 57,
+      "k": 570,
+      "model": "random_forest",
+      "n": 56964,
+      "parameters": {
+        "class_weight": "balanced_subsample",
+        "max_depth": 16,
+        "min_samples_leaf": 5,
+        "n_estimators": 200,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "pr_auc_trapezoidal": 0.758895532682263,
+      "precision": 0.08421052631578947,
+      "recall": 0.8421052631578947,
+      "tn": 56385,
+      "tp": 48
+    },
+    {
+      "average_precision": 0.7589137476933395,
+      "fn": 10,
+      "fp": 523,
+      "fraud": 57,
+      "k": 570,
+      "model": "random_forest",
+      "n": 56964,
+      "parameters": {
+        "class_weight": "balanced_subsample",
+        "max_depth": 12,
+        "min_samples_leaf": 1,
+        "n_estimators": 200,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "pr_auc_trapezoidal": 0.7583624553940831,
+      "precision": 0.0824561403508772,
+      "recall": 0.8245614035087719,
+      "tn": 56384,
+      "tp": 47
+    }
+  ],
+  "input_sha256": "76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89",
+  "limitation": "Exploratory search on a previously used validation set; confirm on new untouched data.",
+  "model_parameters": {
+    "logistic_regression": {
+      "C": 1.0,
+      "class_weight": "balanced",
+      "max_iter": 2000,
+      "random_state": 42,
+      "solver": "lbfgs"
+    },
+    "random_forest": {
+      "class_weight": "balanced_subsample",
+      "max_depth": 12,
+      "min_samples_leaf": 5,
+      "n_estimators": 200,
+      "n_jobs": -1,
+      "random_state": 42
+    }
+  },
+  "selected_model": "logistic_regression",
+  "selection_rule": "validation recall at 1%; within-family ties keep first candidate; family ties favor logistic regression",
+  "test_evaluated": false,
+  "dataset_source": "https://storage.googleapis.com/download.tensorflow.org/data/creditcard.csv",
+  "python_version": "3.12.14",
+  "versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.17.0",
+    "joblib": "1.5.3"
+  },
+  "audit": {
+    "input_sha256": "76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89",
+    "rows": 284807,
+    "fraud": 492,
+    "exact_duplicate_rows_beyond_first": 1081,
+    "identical_feature_vectors_across_splits": {
+      "train__validation": 274,
+      "train__test": 312,
+      "validation__test": 872
+    },
+    "splits": {
+      "train": {
+        "rows": 170882,
+        "fraud": 360,
+        "legitimate": 170522,
+        "fraud_prevalence": 0.002106716915766435,
+        "time_min": 0.0,
+        "time_max": 120395.0,
+        "membership_sha256": "024ad9180d21dd6c261f97dbc275dde13ad78e8191a2ef831e8f460df1a41a1c"
+      },
+      "validation": {
+        "rows": 56964,
+        "fraud": 57,
+        "legitimate": 56907,
+        "fraud_prevalence": 0.001000631978091426,
+        "time_min": 120396.0,
+        "time_max": 145248.0,
+        "membership_sha256": "4ba9df6c670f8c98401e043eeec91a213a5ec475874fe5e2bd0dfb21a428c3e5"
+      },
+      "test": {
+        "rows": 56961,
+        "fraud": 75,
+        "legitimate": 56886,
+        "fraud_prevalence": 0.0013166903670932743,
+        "time_min": 145249.0,
+        "time_max": 172792.0,
+        "membership_sha256": "00562cdb8925e58dd28fbada3b3363c3456456d3815c20f109a871ecee82ef5c"
+      }
+    }
+  }
+}
