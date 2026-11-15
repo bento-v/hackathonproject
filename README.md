@@ -2,6 +2,10 @@
 
 **Make every review count.** AI + Finance · Veritas AI Hackathon 2026
 
+[**Open the self-contained Colab submission**](https://colab.research.google.com/github/bento-v/hackathonproject/blob/main/ReviewWise_Submission.ipynb) · [Colab instructions](COLAB.md)
+
+No local Python setup is needed for the notebook. Save a copy in Drive, add team details, and choose Runtime → Run all.
+
 ReviewWise helps a payment risk analyst prioritize a closed transaction batch
 when only a small fraction can be investigated. Choose a review budget, compare
 the model queue with the largest payments, and reveal historical outcomes.
