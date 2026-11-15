@@ -16,3 +16,7 @@ Saved outputs were verified locally, not in a Google-hosted Colab session. Colab
 The data remains in temporary runtime storage and is fetched again if the runtime resets. Your saved notebook remains in Drive. Do not upload the CSV or generated model binaries to GitHub.
 
 The current notebook preserves baseline settings and the validation-selection rule. Optional tuning does not replace the headline model or optimize against test scores. A failed improvement experiment is reported honestly; no better model is claimed.
+
+## Host brief alignment
+
+The notebook now opens with a requirement-to-evidence checklist for the host's card-fraud brief. It includes a visible test precision–recall curve and an additional independent-transaction flagging function. The function uses a cutoff frozen from validation scores; its actual flag rate is measured separately from the exact top-1% batch policy. Neither policy is presented as a deployed payment authorization system.
